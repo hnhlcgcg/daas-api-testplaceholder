@@ -1,0 +1,220 @@
+{
+  "datasets": [
+        {
+          "name": "test",
+          "value": "test",
+          "permissionentity": "test",
+          "namespace": "test",
+          "status": "pending",
+          "creationdate": "12.12.March 18, 2020, 21:54 (UTC-07:00) 09"
+        },
+        {
+          "name": "test2",
+          "value": "test2",
+          "permissionentity": "test2",
+          "namespace": "test2",
+          "status": "active",
+          "creationdate": "12.12.May 04, 2020, 13:54 (UTC-07:00) 09"
+        },
+        {
+          "name": "test3",
+          "value": "test3",
+          "permissionentity": "test3",
+          "namespace": "test3",
+          "status": "active",
+          "creationdate": "12.12.Dec 20, 2018, 09:54 (UTC-07:00) 09"
+        }    
+  ],
+  "newdataset": {
+    "statusCode": "200",
+    "message": "Dataset has been submitted for onboarding"
+  },
+  "datasetSchema": {
+    "$id": "http://example.com/product.schema.json",
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Onboard New Dataset",
+    "type": "object",
+    "properties": {
+      "producerIdentity": {
+        "title": "Producer Identity",
+        "type": "object",
+        "required": ["producerActiveDirectory", "producerAssignmentGroup"],
+        "properties": {
+          "producerActiveDirectory": {
+            "type": "string",
+            "title": "Producer Active Directory",
+            "description": "Active directory for the producer who owns the dataset",
+            "x-props": {
+              "chips": "true"
+            }
+          },
+          "producerAssignmentGroup": {
+            "type": "string",
+            "title": "Producer Assignment Group",
+            "description": "Producer assignment group for tickets (service-now)",
+            "x-props": {
+              "chips": "true"
+            }
+          }
+        }
+      },
+      "permissionEntity": {
+        "title": "Permission Entity",
+        "type": "object",
+        "required": ["datasetActiveDirectory"],
+        "properties": {
+          "datasetActiveDirectory": {
+            "type": "string",
+            "title": "DatasetActiveDirectory",
+            "description": "Active directory group for dataset where consumer can be added for access.",
+            "x-props": {
+              "chips": "true"
+            }
+          }
+        }
+      },
+      "datasetConfiguration": {
+        "title": "Dataset Configuration",
+        "type": "object",
+        "required": [
+          "datasetName",
+          "datasetId",
+          "datasetDescription",
+          "datasetTypes",
+          "publishSchedule",
+          "fileType",
+          "compressionType",
+          "environment",
+          "schemaPolicy",
+          "retentionPolicy"
+        ],
+        "properties": {
+          "datasetName": {
+            "type": "string",
+            "title": "Dataset Name"
+          },
+          "datasetId": {
+            "type": "string",
+            "title": "Dataset ID"
+          },
+          "datasetDescription": {
+            "type": "string",
+            "title": "Dataset Description"
+          },
+          "datasetType": {
+            "type": "object",
+            "title": "Dataset Type",
+            "oneOf": [
+              {
+                "title": "MFT_PUSH",
+                "required": ["userArn", "ingestionPath"],
+                "properties": {
+                  "datasetType": {
+                    "type": "string",
+                    "const": "MFT_PUSH"
+                  },
+                  "userArn": {
+                    "type": "string",
+                    "title": "MFT_PUSH: User ARN"
+                  },
+                  "ingestionPath": {
+                    "type": "string",
+                    "title": "MFT_PUSH: Ingestion Path"
+                  }
+                }
+              },
+              {
+                "title": "AWS_PUSH",
+                "required": ["serviceRoleArn", "ingestionPath"],
+                "properties": {
+                  "datasetType": {
+                    "type": "string",
+                    "const": "AWS_PUSH"
+                  },
+                  "serviceRoleArn": {
+                    "type": "string",
+                    "title": "AWS_PUSH: Service Role ARN"
+                  },
+                  "ingestionPath": {
+                    "type": "string",
+                    "title": "AWS_PUSH: Ingestion Path"
+                  }
+                }
+              }
+            ]
+          },
+          "publishSchedule": {
+            "type": "string",
+            "title": "Publish Schedule",
+            "enum": ["Weekly", "Daily", "Monthly"]
+          },
+          "fileType": {
+            "type": "object",
+            "title": "File Type",
+            "oneOf": [
+              {
+                "title": "Parquet",
+                "properties": {
+                  "fileType": {
+                    "type": "string",
+                    "const": "Parquet"
+                  }
+                }
+              },
+              {
+                "title": "CSV",
+                "required": ["csvSeparator", "csvWithHeader", "csvSkipFirst"],
+                "properties": {
+                  "fileType": {
+                    "type": "string",
+                    "const": "CSV"
+                  },
+                  "csvSeparator": {
+                    "type": "string",
+                    "title": "CSV: Separator"
+                  },
+                  "csvWithHeader": {
+                    "type": "boolean",
+                    "title": " CSV: With Header?",
+                    "enum": ["true", "false"],
+                    "x-display": "radio"
+                  },
+                  "csvSkipFirst": {
+                    "type": "boolean",
+                    "title": "CSV: Skip First?",
+                    "enum": ["true", "false"],
+                    "x-display": "radio"
+                  }
+                }
+              }
+            ]
+          },
+          "compressionType": {
+            "type": "string",
+            "title": "Compression Type",
+            "enum": ["GZIP", "BZIP"]
+          },
+          "environment": {
+            "type": "string",
+            "title": "Environment",
+            "enum": ["Sandbox", "Production"]
+          },
+          "schemaPolicy": {
+            "type": "string",
+            "title": "Schema Policy",
+            "description": "ADD_ONLY : Only allow addition of new columns | LAX: Allow addition or removal of columns | STRICT: No Change Allowed",
+            "enum": ["Strict", "Add Only", "Lax"],
+            "x-props": {
+              "chips": "true"
+            }
+          },
+          "retentionPolicy": {
+            "type": "string",
+            "title": "Retention Policy",
+            "enum": ["One Day", "One Week", "One Month", "Six Months", "One Year", "Forever"]
+          }
+        }
+      }
+    }
+  }
+}
